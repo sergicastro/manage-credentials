@@ -37,4 +37,13 @@ class BusinessService
             puts "key", "#{@conf.conf[provider]["key"]}".colorize(:cyan)
         end
     end
+
+    def set_location(new_location)
+        @conf.put(['Api', 'location'], new_location)
+        puts "Location setted to #{new_location}".colorize(:green)
+    end
+    
+    def show_location
+        puts "Current location #{@conf.location}".colorize(:cyan)
+    end
 end

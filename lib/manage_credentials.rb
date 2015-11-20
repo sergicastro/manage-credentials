@@ -29,4 +29,14 @@ class ManageCredentials < Thor
     def printkeys(provider)
         BusinessService.new(Conf.new).print(provider)
     end
+
+    desc "set_location <new_location>", "Sets the new api location"
+    def set_location(new_location)
+        BusinessService.new(Conf.new).set_location(new_location)
+    end
+
+    desc "show_location", "Shows the current api location"
+    def show_location
+        BusinessService.new(Conf.new).show_location
+    end
 end
