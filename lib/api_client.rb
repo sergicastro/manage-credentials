@@ -1,135 +1,11 @@
-#!/usr/bin/ruby
-
-### Manage public provider credentials easily into Abiquo platform enterprises
-## The usege is so easy too, only requires a yaml configuration file with the provider credentials to use.
-## File: $HOME/cloud_credentials.yml
-## Example:
-#   Api:
-#       location: http://host:80/api
-#       user: user
-#       password: pass
-#
-#   AMAZON:
-#       id:  amazon_accesskey
-#       key: amazon_key
-#   digitalocean:
-#       id:  do_api_id
-#       key: do_key
-
-require 'json'
 require 'net/https'
-require 'yaml'
-require 'thor'
-require 'colorize'
-
-class Conf
-    def initialize
-        @conf = YAML.load_file("#{ENV["HOME"]}/cloud_credentials.yml")
-    end
-
-    def conf
-        @conf
-    end
-
-    def location
-        @conf['Api']['location']
-    end
-
-    def user
-        @conf['Api']['user']
-    end
-
-    def password
-        @conf['Api']['password']
-    end
-end
-
-class ManageCredentials < Thor
-
-    desc "add <provider> <enterprise>", "Adds the credentials for <provider> into the <enterprise>"
-    def add(provider, enterprise)
-        BusinessService.new(Conf.new).add(provider, enterprise)
-    end
-
-    option :remote, :type => :boolean
-    desc "list_providers [remote]", "Lists the config file providers. --remote option will list the remote ones"
-    def list_providers
-        BusinessService.new(Conf.new).list_providers(options.remote)
-    end
-
-    desc "release <provider> <enterprise>", "Release the credentials for <provider> from the <enterprise>"
-    def release(provider, enterprise)
-        BusinessService.new(Conf.new).release(provider, enterprise)
-    end
-
-    desc "list <enterprise>", "List the attached credientials of the <enterprise>"
-    def list(enterprise)
-        BusinessService.new(Conf.new).list(enterprise)
-    end
-
-    desc "printkeys <provider>", "Print the provider keys"
-    def printkeys(provider)
-        BusinessService.new(Conf.new).print(provider)
-    end
-end
-
-class BusinessService
-    def initialize(conf)
-        @conf = conf
-        @client = ApiClient.new(conf)
-    end
-
-    def add(provider, enterprise)
-        raise Exception.new("Provider #{provider} not found in configuration file") if @conf.conf[provider].nil?
-
-        key = @conf.conf[provider]['key']
-        access = @conf.conf[provider]['id']
-        link = @client.get_technology_link(provider)
-
-        raise Exception.new("No link found for provider: #{provider}".colorize(:red)) if link.nil?
-        puts "#{@client.post_credentials(key, access, enterprise, link)}".colorize(:green)
-    end
-
-    def list_providers(remote)
-        puts "#{@client.get_providers(remote)}".colorize(:green)
-    end
-
-    def release(provider, enterprise)
-        puts "#{@client.delete_credentials(provider, enterprise)}".colorize(:green)
-    end
-
-    def list(enterprise)
-        puts "#{@client.list_credentials(enterprise)}".colorize(:green)
-    end
-    
-    def print(provider)
-        if provider != nil
-            puts @conf.conf[provider]["id"]
-            puts "id", "#{@conf.conf[provider]["id"]}".colorize(:cyan)
-            puts "key", "#{@conf.conf[provider]["key"]}".colorize(:cyan)
-        end
-    end
-end
+require 'json'
 
 class ApiClient
     def initialize(conf)
         @conf = conf
     end
 
-    # Given an enterprise name returns the enterprise id
-    # Parans:
-    #   +enterprise_name+:: The name of the enterprise where get the id
-    def get_enterprise_id(enterprise_name)
-        request = Net::HTTP::Get.new("#{@conf.location}/admin/enterprises")
-        request.add_field('accept', 'application/vnd.abiquo.enterprises+json')
-        puts "Searching for enterprise #{enterprise_name}..."
-        response = send_request(request)
-        ids = JSON.parse(response.body)["collection"].select{ |x| x["name"] == enterprise_name }.collect{ |x| x["id"] }
-        enterprise_id = if ids.empty? then nil else ids[0] end
-        raise Exception.new("Enterprise #{enterprise_name} not found".colorize(:red)) if enterprise_id.nil?
-        enterprise_id
-    end
-    
     # Retrieves the technology (rel=hypervisor) link from the api
     # Params:
     #   +provider+:: the provisor (hypervisor) link to retrieve
@@ -243,7 +119,18 @@ class ApiClient
         providers.sort
     end
 
+    # Given an enterprise name returns the enterprise id
+    # Params:
+    #   +enterprise_name+:: The name of the enterprise where get the id
+    def get_enterprise_id(enterprise_name)
+        request = Net::HTTP::Get.new("#{@conf.location}/admin/enterprises")
+        request.add_field('accept', 'application/vnd.abiquo.enterprises+json')
+        puts "Searching for enterprise #{enterprise_name}..."
+        response = send_request(request)
+        ids = JSON.parse(response.body)["collection"].select{ |x| x["name"] == enterprise_name }.collect{ |x| x["id"] }
+        enterprise_id = if ids.empty? then nil else ids[0] end
+        raise Exception.new("Enterprise #{enterprise_name} not found".colorize(:red)) if enterprise_id.nil?
+        enterprise_id
+    end
+    
 end
-
-# exectute it
-ManageCredentials.start(ARGV)
