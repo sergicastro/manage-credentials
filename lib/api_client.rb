@@ -4,6 +4,7 @@ require 'json'
 class ApiClient
     def initialize(conf)
         @conf = conf
+        @use_ssl = conf.location.start_with?("https")
     end
 
     # Retrieves the technology (rel=hypervisor) link from the api
@@ -67,8 +68,12 @@ class ApiClient
     #   +enterprise+:: where get the credentials
     def list_credentials(enterprise)
         links = JSON.parse(get_credentials(enterprise))["collection"].collect{ |cred| cred["links"] }.zip
-        match = links[0][0].select{ |link| link["rel"] == "hypervisortype" }
-        match.collect{ |link| link["title"] }
+        if not links.nil? and not links[0].nil?
+            match = links[0][0].select{ |link| link["rel"] == "hypervisortype" }
+            return match.collect{ |link| link["title"] }
+        else
+            return []
+        end
     end
 
 
@@ -78,8 +83,10 @@ class ApiClient
     def send_request(request)
         uri = URI.parse(@conf.location)
         http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        if @use_ssl
+            http.use_ssl = true
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
         request.basic_auth(@conf.user, @conf.password)
         response = http.request(request)
         puts "#{response.code} - #{response.message}"
