@@ -1,8 +1,8 @@
 require 'yaml'
 
 class Conf
-    def initialize
-        @file_path = "#{ENV["HOME"]}/cloud_credentials.yml"
+    def initialize file_path
+        @file_path = file_path
         @conf = YAML.load_file(@file_path)
     end
 
