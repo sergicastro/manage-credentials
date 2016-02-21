@@ -1,6 +1,6 @@
 require_relative '../lib/manage_credentials.rb'
+require_relative 'server_mock/api_mock.rb'
 require 'test/unit'
-require 'api_mock.rb'
 require 'stringio'
 require 'colorize'
 
@@ -14,7 +14,7 @@ server_mock.abort_on_exception = true
 while ms.started != true do
 end
 
-ManageCredentials.conf = Conf.new('test/conf_test.yml')
+ManageCredentials.conf = Conf.new('test/server_mock/conf_test.yml')
 
 class ManageCredentialsTest < Test::Unit::TestCase
 

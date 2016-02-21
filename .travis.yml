@@ -1,4 +1,9 @@
 language: ruby
 rvm: 1.9.3
+
 install: bundle install
 script: bundle exec rake
+
+addons:
+    code_climate:
+        repo_token: d86360e188699a27f0c886d370178b7ebfea449496674356d0b7f6376a4cc55f
