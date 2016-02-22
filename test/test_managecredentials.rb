@@ -19,13 +19,20 @@ ManageCredentials.conf = Conf.new('test/server_mock/conf_test.yml')
 class ManageCredentialsTest < Test::Unit::TestCase
 
     def test_list_providers_remote
-        foo = StringIO.new
-        $stdout = foo
+        $stdout = StringIO.new
         ManageCredentials.start(['list_providers', '--remote'])
         expected = "Getting configured provider from api "
         expected << "http://localhost:4567/api...\n"
         expected << "200 - OK\n"
-        expected << "[\"amazon \"]".green
+        expected << "[\"amazon \", \"digitalocean \"]".green
+        expected << "\n"
+        assert_equal(expected, $stdout.string)
+    end
+
+    def test_list_providers_from_file
+        $stdout = StringIO.new
+        ManageCredentials.start(['list_providers'])
+        expected = "[\"amazon\", \"rackspace\"]".green
         expected << "\n"
         assert_equal(expected, $stdout.string)
     end

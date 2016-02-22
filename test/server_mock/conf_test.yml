@@ -2,3 +2,11 @@ Api:
     location: http://localhost:4567/api
     user: test
     password: test
+
+amazon:
+    id: amazon-id
+    key: amazon-key
+
+rackspace:
+    id: rackspace-id
+    key: rackspace-key

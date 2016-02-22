@@ -16,6 +16,7 @@ class ApiMockServer
                          'application/vnd.abiquo.hypervisortypes+json')
         collection = []
         collection << {:name => "amazon"}
+        collection << {:name => "digitalocean"}
         types = {:collection => collection}
         dto = JSON.generate(types)
         rbyr.def_response('200','OK', dto, 'application/vnd.abiquo.hypervisortypes+json')
