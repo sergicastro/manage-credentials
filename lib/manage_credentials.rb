@@ -4,7 +4,6 @@ require_relative 'business_service.rb'
 
 
 class ManageCredentials < Thor
-    @@conf
 
     def self.conf=conf_instance
         @@conf = conf_instance

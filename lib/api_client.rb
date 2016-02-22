@@ -16,7 +16,7 @@ class ApiClient
         puts "Searching for provider #{provider}..."
         response = send_request(request)
         provider_type = JSON.parse(response.body)["collection"].select{ |x| x["name"] == provider }[0]
-        link = provider_type["links"].select{ |link| link["rel"] == "self" }[0]
+        link = provider_type["links"].select{ |l| l["rel"] == "self" }[0]
         link['rel'] = 'hypervisortype'
         link
     end
