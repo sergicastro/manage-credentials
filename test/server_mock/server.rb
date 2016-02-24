@@ -34,6 +34,9 @@ class Server
             socket = server.accept
             request = read_request(socket)
             rbyr = @rbyrs.select {|r| r.match_request?(request)}[0]
+            if rbyr.nil?
+                raise Exception.new("No mock request found for: #{request} in #{@rbyrs}")
+            end
             send_response(socket, rbyr)
             socket.close
         end
@@ -78,8 +81,9 @@ class RbyR
         if contenttype.nil?
             contenttype = @rq_contenttype
         end
+
         return @rq_method == method && @rq_path == path &&
-            accept.include?(if @rq_accept.nil? then "" else @rq_accept end) &&
+            accept.include?(if @rq_accepttype.nil? then "" else @rq_accepttype end) &&
             contenttype.include?(if @rq_contenttype.nil? then "" else @rq_contenttype end)
     end
 end

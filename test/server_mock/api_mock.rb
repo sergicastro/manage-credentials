@@ -11,6 +11,15 @@ class ApiMockServer
     def run
         server = Server.new
 
+        server.add_RbyR(hypervisortypes)
+        server.add_RbyR(enterprises)
+        server.add_RbyR(credentials)
+
+        @started=true
+        server.run
+    end
+
+    def hypervisortypes
         rbyr = RbyR.new
         rbyr.def_request('GET', '/api/config/hypervisortypes', '',
                          'application/vnd.abiquo.hypervisortypes+json')
@@ -20,10 +29,30 @@ class ApiMockServer
         types = {:collection => collection}
         dto = JSON.generate(types)
         rbyr.def_response('200','OK', dto, 'application/vnd.abiquo.hypervisortypes+json')
+        return rbyr
+    end
 
-        server.add_RbyR(rbyr)
+    def enterprises
+        rbyr = RbyR.new
+        rbyr.def_request('GET', '/api/admin/enterprises', '',
+                        'application/vnd.abiquo.enterprises+json')
+        collection = []
+        collection << {:name => "enterprise 1", :id => 1}
+        collection << {:name => "enterprise 2", :id => 2}
+        rbyr.def_response('200', 'OK', JSON.generate({:collection => collection}),
+                         'appliaction/vnd.abiquo.enterprises+json')
+        return rbyr
+    end
 
-        @started=true
-        server.run
+    def credentials
+        rbyr = RbyR.new
+        rbyr.def_request('GET', '/api/admin/enterprises/1/credentials', '',
+                        'application/vnd.abiquo.publiccloudcredentialslist+json')
+        creds = []
+        creds << {links: [{rel: "hypervisortype", title: "amazon"}]}
+        creds << {links: [{rel: "hypervisortype", title: "digitalocean"}]}
+        rbyr.def_response('200', 'OK', JSON.generate({:collection => creds}),
+                         'application/vnd.aiquo.publiccloudcredentials+json')
+        return rbyr
     end
 end

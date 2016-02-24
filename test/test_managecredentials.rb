@@ -36,4 +36,40 @@ class ManageCredentialsTest < Test::Unit::TestCase
         expected << "\n"
         assert_equal(expected, $stdout.string)
     end
+
+    def test_show_location
+        $stdout = StringIO.new
+        ManageCredentials.start(['show_location'])
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
+        assert_equal(expected, $stdout.string)
+    end
+
+    def test_set_location
+        f = File.new("deleteme.yml","w")
+        f.puts("Api:\n    location: old")
+        f.close
+        ManageCredentials.conf = Conf.new("deleteme.yml")
+
+        $stdout = StringIO.new
+        ManageCredentials.start(['set_location','https://locationtest/api'])
+        expected = "Location setted to https://locationtest/api".green
+        expected << "\n"
+        assert_equal(expected, $stdout.string)
+    ensure
+        ManageCredentials.conf = Conf.new('test/server_mock/conf_test.yml')
+        File.delete("deleteme.yml") if File.exist?("deleteme.yml")
+    end
+
+    def test_list_credentials_from_enterprise
+        $stdout = StringIO.new
+        ManageCredentials.start(['list','enterprise 1'])
+        expected = "Searching for enterprise enterprise 1...\n"
+        expected << "200 - OK\n"
+        expected << "Retrieving credentials for enterprise enterprise 1...\n"
+        expected << "200 - OK\n"
+        expected << "[\"amazon\"]".green
+        expected << "\n"
+        assert_equal(expected, $stdout.string)
+    end
 end
