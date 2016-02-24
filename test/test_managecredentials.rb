@@ -47,7 +47,7 @@ class ManageCredentialsTest < Test::Unit::TestCase
 
     def test_set_location
         f = File.new("deleteme.yml","w")
-        f.puts("Api:\n    location: old")
+        f.puts("Api:\n  location: old")
         f.close
         ManageCredentials.conf = Conf.new("deleteme.yml")
 
@@ -56,6 +56,13 @@ class ManageCredentialsTest < Test::Unit::TestCase
         expected = "Location setted to https://locationtest/api".green
         expected << "\n"
         assert_equal(expected, $stdout.string)
+
+        content = File.open("deleteme.yml", "rb").read
+        expected_file_content = ""
+        expected_file_content << "---\n"
+        expected_file_content << "Api:\n"
+        expected_file_content << "  location: https://locationtest/api\n"
+        assert_equal(expected_file_content, content)
     ensure
         ManageCredentials.conf = Conf.new('test/server_mock/conf_test.yml')
         File.delete("deleteme.yml") if File.exist?("deleteme.yml")
