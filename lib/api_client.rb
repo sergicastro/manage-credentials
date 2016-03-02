@@ -7,6 +7,36 @@ class ApiClient
         @use_ssl = conf.location.start_with?("https")
     end
 
+    # Send the request
+    # Params:
+    #   +request+:: the request to send
+    def send_request(request)
+        uri = URI.parse(@conf.location)
+        http = Net::HTTP.new(uri.host, uri.port)
+        if @use_ssl
+            http.use_ssl = true
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+        request.basic_auth(@conf.user, @conf.password)
+        response = http.request(request)
+        puts "#{response.code} - #{response.message}"
+        if not response.code =~ /2\d\d/
+            if not response.body.nil? and not response.body.empty?
+                json = JSON.parse(response.body)
+                codes = json["collection"].collect{ |x| x["code"] }
+                messages = json["collection"].collect{ |x| x["messages"] }
+                ex_message = ""
+                codes.zip(messages).each do |code, message|
+                    ex_message << "#{code} - #{message}\n"
+                end
+            else
+                ex_message=""
+            end
+            raise Exception.new(ex_message.colorize(:red))
+        end
+        response
+    end
+
     # Retrieves the technology (rel=hypervisor) link from the api
     # Params:
     #   +provider+:: the provisor (hypervisor) link to retrieve
@@ -74,38 +104,6 @@ class ApiClient
         else
             return []
         end
-    end
-
-
-    # Send the request
-    # Params:
-    #   +request+:: the request to send
-    def send_request(request)
-        uri = URI.parse(@conf.location)
-        http = Net::HTTP.new(uri.host, uri.port)
-        if @use_ssl
-            http.use_ssl = true
-            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
-        request.basic_auth(@conf.user, @conf.password)
-        response = http.request(request)
-        puts "#{response.code} - #{response.message}"
-        if not response.code =~ /2\d\d/
-            if not response.body.nil? and not response.body.empty?
-                json = JSON.parse(response.body)
-                puts json
-                codes = json["collection"].collect{ |x| x["code"] }
-                messages = json["collection"].collect{ |x| x["messages"] }
-                ex_message = ""
-                codes.zip(messages).each do |code, message|
-                    ex_message << "#{code} - #{message}\n"
-                end
-            else
-                ex_message=""
-            end
-            raise Exception.new(ex_message.colorize(:red))
-        end
-        response
     end
 
     # Retrieves the list of all providers available to use.
