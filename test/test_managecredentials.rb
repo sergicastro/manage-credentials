@@ -104,7 +104,7 @@ class ManageCredentialsTest < Test::Unit::TestCase
         File.delete("deleteme.yml") if File.exist?("deleteme.yml")
     end
 
-    def test_a_release
+    def test_release
         $stdout = StringIO.new
         ManageCredentials.start(['release', 'amazon', 'enterprise 1'])
         expected = "Searching for enterprise enterprise 1...\n"
@@ -113,6 +113,20 @@ class ManageCredentialsTest < Test::Unit::TestCase
         expected << "200 - OK\n"
         expected << "Deleting the credentials of the provider amazon from the enterprise enterprise 1\n"
         expected << "204 - No content\n\n"
+        assert_equal(expected, $stdout.string)
+    end
+
+    def test_add
+        $stdout = StringIO.new
+        ManageCredentials.start(['add', 'amazon', 'enterprise 1'])
+        expected = "Searching for provider amazon...\n"
+        expected << "200 - OK\n"
+        expected << "Searching for enterprise enterprise 1...\n"
+        expected << "200 - OK\n"
+        expected << "Posting credentials into enterprise enterprise 1...\n"
+        expected << "201 - Created\n"
+        expected << "{\"name\":\"amazon\"}".green
+        expected << "\n"
         assert_equal(expected, $stdout.string)
     end
 end

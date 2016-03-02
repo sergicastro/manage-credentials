@@ -15,6 +15,7 @@ class ApiMockServer
         server.add_RbyR(enterprises)
         server.add_RbyR(credentials)
         server.add_RbyR(credentials_delete)
+        server.add_RbyR(credentials_post)
 
         @started=true
         server.run
@@ -25,8 +26,8 @@ class ApiMockServer
         rbyr.def_request('GET', '/api/config/hypervisortypes', '',
                          'application/vnd.abiquo.hypervisortypes+json')
         collection = []
-        collection << {:name => "amazon"}
-        collection << {:name => "digitalocean"}
+        collection << {:name => "amazon", :links => [{:rel => "self", href: "/api/confg/hypervisortpyes/amazon"}]}
+        collection << {:name => "digitalocean", :links => [{:rel => "self", href: "/api/confg/hypervisortpyes/digitalocean"}]}
         types = {:collection => collection}
         dto = JSON.generate(types)
         rbyr.def_response('200','OK', dto, 'application/vnd.abiquo.hypervisortypes+json')
@@ -61,6 +62,18 @@ class ApiMockServer
         rbyr = RbyR.new
         rbyr.def_request('DELETE', '/api/admin/enterprises/1/credentials/1', '', '')
         rbyr.def_response('204', 'No content', '', '')
+        return rbyr
+    end
+
+    def credentials_post
+        rbyr = RbyR.new
+        rbyr.def_request('POST', '/api/admin/enterprises/1/credentials',
+                         # 'application/vnd.abiquo.publiccloudcredentialjson',
+                         '',
+                         'application/vnd.abiquo.publiccloudcredentials+json')
+        cred = {name: "amazon"}
+        rbyr.def_response('201', 'Created', JSON.generate(cred),
+                         'application/vnd.abiquo.publiccloudcredentialslist+json')
         return rbyr
     end
 end
