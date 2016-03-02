@@ -73,11 +73,11 @@ class RbyR
     end
 
     def match_request? request
-        method, path = request[0].match(/(\w{3,4}) (.*) HTTP\/1.1/i).captures
+        method, path = request[0].match(/(\w{3,6}) (.*) HTTP\/1.1/i).captures
         contenttype = request.select {|line| line.start_with?("Content-Type")}[0]
         accept = request.select {|line| line.start_with?("Accept")}[0]
 
-        path = path.match(/http:\/\/.*:\d{3,4}(.*)/).captures[0]
+        path = path.match(/(http:\/\/.*:\d{3,4})?(\/.*)/).captures[1]
         if contenttype.nil?
             contenttype = @rq_contenttype
         end

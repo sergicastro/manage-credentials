@@ -79,4 +79,40 @@ class ManageCredentialsTest < Test::Unit::TestCase
         expected << "\n"
         assert_equal(expected, $stdout.string)
     end
+
+    def test_printkeys
+        f = File.new("deleteme.yml","w")
+        content = "Api:\n"
+        content << "  location: http://location/api\n"
+        content << "amazon:\n"
+        content << "  id: amazon-id\n"
+        content << "  key: amazon-key"
+        f.puts(content)
+        f.close
+        ManageCredentials.conf = Conf.new("deleteme.yml")
+
+        $stdout = StringIO.new
+        ManageCredentials.start(['printkeys', 'amazon'])
+        expected = "id\n"
+        expected << "amazon-id".cyan
+        expected << "\nkey\n"
+        expected << "amazon-key".cyan
+        expected << "\n"
+        assert_equal(expected, $stdout.string)
+    ensure
+        ManageCredentials.conf = Conf.new('test/server_mock/conf_test.yml')
+        File.delete("deleteme.yml") if File.exist?("deleteme.yml")
+    end
+
+    def test_a_release
+        $stdout = StringIO.new
+        ManageCredentials.start(['release', 'amazon', 'enterprise 1'])
+        expected = "Searching for enterprise enterprise 1...\n"
+        expected << "200 - OK\n"
+        expected << "Retrieving credentials for enterprise enterprise 1...\n"
+        expected << "200 - OK\n"
+        expected << "Deleting the credentials of the provider amazon from the enterprise enterprise 1\n"
+        expected << "204 - No content\n\n"
+        assert_equal(expected, $stdout.string)
+    end
 end

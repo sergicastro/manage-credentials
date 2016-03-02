@@ -32,7 +32,6 @@ class BusinessService
     
     def print(provider)
         if provider != nil
-            puts @conf.conf[provider]["id"]
             puts "id", "#{@conf.conf[provider]["id"]}".colorize(:cyan)
             puts "key", "#{@conf.conf[provider]["key"]}".colorize(:cyan)
         end

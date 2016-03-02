@@ -14,6 +14,7 @@ class ApiMockServer
         server.add_RbyR(hypervisortypes)
         server.add_RbyR(enterprises)
         server.add_RbyR(credentials)
+        server.add_RbyR(credentials_delete)
 
         @started=true
         server.run
@@ -49,10 +50,17 @@ class ApiMockServer
         rbyr.def_request('GET', '/api/admin/enterprises/1/credentials', '',
                         'application/vnd.abiquo.publiccloudcredentialslist+json')
         creds = []
-        creds << {links: [{rel: "hypervisortype", title: "amazon"}]}
-        creds << {links: [{rel: "hypervisortype", title: "digitalocean"}]}
+        creds << {links: [{rel: "hypervisortype", title: "amazon"}, {rel: "edit", href: "/api/admin/enterprises/1/credentials/1"}]}
+        creds << {links: [{rel: "hypervisortype", title: "digitalocean"}, {rel: "edit", href: "/api/admin/enterprises/1/credentials/2"}]}
         rbyr.def_response('200', 'OK', JSON.generate({:collection => creds}),
                          'application/vnd.aiquo.publiccloudcredentials+json')
+        return rbyr
+    end
+
+    def credentials_delete
+        rbyr = RbyR.new
+        rbyr.def_request('DELETE', '/api/admin/enterprises/1/credentials/1', '', '')
+        rbyr.def_response('204', 'No content', '', '')
         return rbyr
     end
 end
