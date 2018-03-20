@@ -6,5 +6,4 @@ gem 'json', '~> 1.8.2'
 gem 'openssl', '~> 2.0.0'
 gem 'rake', '~> 12.0.0'
 gem 'test-unit', group: :test, require: false
-gem 'codeclimate-test-reporter', group: :test, require: nil
 gem 'simplecov', require: false, group: :test

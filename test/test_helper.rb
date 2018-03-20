@@ -1,10 +1,6 @@
 require "simplecov"
 SimpleCov.start
 
-# require "codeclimate-test-reporter"
-# CodeClimate::TestReporter.start
-
-
 require_relative 'server_mock/api_mock.rb'
 
 ms = ApiMockServer.new
