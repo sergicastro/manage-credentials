@@ -1,5 +1,5 @@
 # manage-credentials
-
+![Ruby Action](https://github.com/sergicastro/manage-credentials/workflows/Ruby/badge.svg)
 [![Build Status](https://travis-ci.org/sergicastro/manage-credentials.svg?branch=master)](https://travis-ci.org/sergicastro/manage-credentials)
 [![Code Climate](https://codeclimate.com/github/sergicastro/manage-credentials/badges/gpa.svg)](https://codeclimate.com/github/sergicastro/manage-credentials)
 [![Test Coverage](https://codeclimate.com/github/sergicastro/manage-credentials/badges/coverage.svg)](https://codeclimate.com/github/sergicastro/manage-credentials/coverage)
