@@ -11,8 +11,8 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
     def test_list_providers_remote
         $stdout = StringIO.new
         ManageCredentials.start(['list_providers', '--remote'])
-        expected = "Getting configured provider from api "
-        expected << "http://localhost:4567/api...\n"
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
         expected << "200 - OK\n"
         expected << "[\"amazon \", \"digitalocean \"]".green
         expected << "\n"
@@ -22,7 +22,9 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
     def test_list_providers_from_file
         $stdout = StringIO.new
         ManageCredentials.start(['list_providers'])
-        expected = "[\"amazon\", \"rackspace\"]".green
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
+        expected << "[\"amazon\", \"rackspace\"]".green
         expected << "\n"
         assert_equal(expected, $stdout.string)
     end
@@ -61,7 +63,9 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
     def test_list_credentials_from_enterprise
         $stdout = StringIO.new
         ManageCredentials.start(['list','enterprise 1'])
-        expected = "Searching for enterprise enterprise 1...\n"
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
+        expected << "Searching for enterprise enterprise 1...\n"
         expected << "200 - OK\n"
         expected << "Retrieving credentials for enterprise enterprise 1...\n"
         expected << "200 - OK\n"
@@ -73,7 +77,7 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
     def test_printkeys
         f = File.new("deleteme.yml","w")
         content = "Api:\n"
-        content << "  location: http://location/api\n"
+        content << "  location: http://localhost:4567/api\n"
         content << "amazon:\n"
         content << "  id: amazon-id\n"
         content << "  key: amazon-key"
@@ -83,7 +87,9 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
 
         $stdout = StringIO.new
         ManageCredentials.start(['printkeys', 'amazon'])
-        expected = "id\n"
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
+        expected << "id\n"
         expected << "amazon-id".cyan
         expected << "\nkey\n"
         expected << "amazon-key".cyan
@@ -97,7 +103,9 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
     def test_release
         $stdout = StringIO.new
         ManageCredentials.start(['release', 'amazon', 'enterprise 1'])
-        expected = "Searching for enterprise enterprise 1...\n"
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
+        expected << "Searching for enterprise enterprise 1...\n"
         expected << "200 - OK\n"
         expected << "Retrieving credentials for enterprise enterprise 1...\n"
         expected << "200 - OK\n"
@@ -109,7 +117,9 @@ class ManageCredentialsOKTest < Test::Unit::TestCase
     def test_add
         $stdout = StringIO.new
         ManageCredentials.start(['add', 'amazon', 'enterprise 1'])
-        expected = "Searching for provider amazon...\n"
+        expected = "Current location http://localhost:4567/api".cyan
+        expected << "\n"
+        expected << "Searching for provider amazon...\n"
         expected << "200 - OK\n"
         expected << "Searching for enterprise enterprise 1...\n"
         expected << "200 - OK\n"

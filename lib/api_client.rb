@@ -114,7 +114,6 @@ class ApiClient
         if remote
             request = Net::HTTP::Get.new("#{@conf.location}/config/hypervisortypes")
             request.add_field('accept','application/vnd.abiquo.hypervisortypes+json')
-            puts "Getting configured provider from api #{@conf.location}..."
             response = send_request(request)
             providers = JSON.parse(response.body)["collection"].collect{ |prov| "#{prov["name"]} #{prov["realName"]}" }
         else
